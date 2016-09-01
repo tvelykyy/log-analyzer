@@ -41,7 +41,12 @@ public class BigqueryClient {
             QueryResponse response = bigquery.jobs()
                     .query(project, new QueryRequest().setQuery(sql))
                     .execute();
-            return response.getRows();
+            List<TableRow> result = response.getRows();
+            if (result == null) {
+                result = Collections.emptyList();
+            }
+
+            return result;
         } catch (IOException e) {
             LOG.error(e.getMessage());
             throw new RuntimeException(e);
