@@ -4,6 +4,7 @@ import com.google.api.services.bigquery.model.TableRow;
 import com.tvelykyy.bigquery.BigqueryClient;
 import com.tvelykyy.loganalyzer.webui.model.IpActivityForPeriod;
 import com.tvelykyy.loganalyzer.webui.model.IpsSummaryForPeriod;
+import com.tvelykyy.loganalyzer.webui.model.TotalForPeriod;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -19,12 +20,15 @@ import static java.util.stream.Collectors.toList;
 
 @Service
 public class BigqueryService implements DdosService {
+    private static final String SOURCE_SKELETON = "[%s:%s.%s]";
 
     private static final String SUMMARY_QUERY_SKELETON = "SELECT ip, count(*) AS total FROM [%s:%s.%s] " +
             "WHERE TIMESTAMP_TO_MSEC(CURRENT_TIMESTAMP()) - datetime < %s GROUP BY ip HAVING count(*) > 100";
 
     private static final String ACTIVITY_QUERY_SKELETON = "SELECT datetime, count(*) AS total FROM [%s:%s.%s] " +
             "WHERE TIMESTAMP_TO_MSEC(CURRENT_TIMESTAMP()) - datetime < %s AND ip = '{ip}' GROUP BY ip, datetime";
+
+    private static final String TOTAL_QUERY_SKELETON = "SELECT COUNT(*) FROM {source} WHERE datetime >= {start} AND datetime < {end}";
 
     @Autowired
     private BigqueryClient client;
@@ -41,8 +45,23 @@ public class BigqueryService implements DdosService {
     @Value("${last.minutes}")
     private Integer periodInMinutes;
 
+    private String source;
+
     private String summaryQuery;
     private String activityQuery;
+
+    @Override
+    public TotalForPeriod getTotal(long startIncluded, long endExcluded) {
+        String query = TOTAL_QUERY_SKELETON
+                .replace("{source}", source)
+                .replace("{start}", String.valueOf(startIncluded))
+                .replace("{end}", String.valueOf(endExcluded));
+
+        List<TableRow> tableRows = client.executeQuery(query);
+        long total = Long.parseLong((String) tableRows.get(0).getF().get(0).getV());
+
+        return new TotalForPeriod(total, startIncluded, endExcluded);
+    }
 
     @Override
     public IpsSummaryForPeriod getIpsSummary() {
@@ -75,6 +94,7 @@ public class BigqueryService implements DdosService {
 
     @PostConstruct
     public void generateQuery() {
+        source = String.format(SOURCE_SKELETON, project, dataset, table);
         long millis = periodInMinutes * 60 * 1000;
         summaryQuery = String.format(SUMMARY_QUERY_SKELETON, project, dataset, table, millis);
         activityQuery = String.format(ACTIVITY_QUERY_SKELETON, project, dataset, table, millis);

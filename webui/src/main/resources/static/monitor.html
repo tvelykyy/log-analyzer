@@ -1,0 +1,17 @@
+<html>
+    <head>
+        <title>Monitoring</title>
+        <script src="js/jquery.min.js"></script>
+        <script src="js/jquery.jqplot.min.js"></script>
+        <link rel="stylesheet" type="text/css" href="css/jquery.jqplot.min.css"/>
+
+        <script type="text/javascript">
+            $(document).ready(function(){
+              var plot1 = $.jqplot('chart1', [[3,7,9,1,5,3,8,2,5]]);
+            });
+        </script>
+    </head>
+    <body>
+        <div id="chart1"></div>
+    </body>
+</html>
