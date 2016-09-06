@@ -66,13 +66,14 @@ public class BigqueryClient {
 
         TableDataInsertAllResponse response = streamRows(rows, dataset, table);
 
-        response.getInsertErrors().forEach(e -> {
-            try {
-                LOG.error(e.toPrettyString());
-            } catch (IOException exception) {
-                LOG.error(exception.getMessage());
-            }
-        });
+        Optional.ofNullable(response.getInsertErrors()).ifPresent(list -> list.forEach(e -> {
+                try {
+                    LOG.error(e.toPrettyString());
+                } catch (IOException exception) {
+                    LOG.error(exception.getMessage());
+                }
+            })
+        );
 
         return response;
     }

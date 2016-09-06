@@ -12,6 +12,7 @@
         <module>bigquery-client</module>
         <module>log-generator</module>
         <module>kafka-bigquery</module>
+        <module>file-kafka</module>
     </modules>
     <packaging>pom</packaging>
 
