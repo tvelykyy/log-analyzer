@@ -47,7 +47,12 @@ public class Main {
                 new RandomUserAgentGenerator()
             );
 
-            for (int i = 0; i < 0; i++)
+            for (int i = 0; i < 10000; i++)
+                try {
+                    Thread.sleep(3);
+                } catch (InterruptedException e) {
+                    //ignore
+                }
                 LOGGER.debug(gen.get());
         });
 

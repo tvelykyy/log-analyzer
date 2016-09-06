@@ -8,7 +8,7 @@
         </layout>
     </appender>
 
-    <logger name="com.tvelykyy.bigquery" level="debug"
+    <logger name="com.tvelykyy.kafkabigquery" level="debug"
             additivity="false">
         <appender-ref ref="STDOUT" />
     </logger>
