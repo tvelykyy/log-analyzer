@@ -1,7 +1,10 @@
 package com.tvelykyy.loganalyzer.webui.service;
 
-import com.tvelykyy.loganalyzer.webui.model.IpTotalForPeriod;
+import com.tvelykyy.loganalyzer.webui.model.IpActivityForPeriod;
+import com.tvelykyy.loganalyzer.webui.model.IpsSummaryForPeriod;
 
 public interface DdosService {
-    IpTotalForPeriod getActivityIpsTotal();
+    IpsSummaryForPeriod getIpsSummary();
+
+    IpActivityForPeriod getIpActivity(String ip);
 }
